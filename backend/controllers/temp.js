@@ -78,6 +78,9 @@ const Newuser = new userModel({
 
 const user = await Newuser.save();
 const token = createToken(user._id);
+
+const updateUser = await userModel.findByIdAndUpdate(user._id, { token: token }, { new: true });
+
 res.json({
     success:true,
     message:"User registered successfully",

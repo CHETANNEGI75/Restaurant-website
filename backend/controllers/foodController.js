@@ -3,6 +3,8 @@ import foodModel from "../models/foodmodel.js";
 const addFood = async (req, res) => {
   try {
     const { name, category, description, price } = req.body;
+    console.info("🚀 ~ addFood ~ category:", category)
+    console.info("🚀 ~ addFood ~ name:", name)
 
     if (!req.file) {
       return res.status(400).json({

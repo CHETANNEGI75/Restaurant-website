@@ -3,17 +3,18 @@ import cors from "cors";
 import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
+import cartRouter from "./routes/cartRoute.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 
 import { cloudinary } from "./config/cloudinary.js";
-console.log("KEY (server.js) 👉", process.env.CLOUDINARY_API_KEY);
+console.log("KEY (server.js) 👉", process.env.API_KEY);
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
 });
 // App Config
 const app = express();
@@ -31,6 +32,8 @@ connectDB();
 //api endpoint
 app.use("/api/food", foodRouter);
 app.use("/api/user", userRouter);
+app.use("/images", express.static("uploads"));
+app.use("/api/cart", cartRouter);
 
 app.get("/", (req, res) => {
   res.send("API working");

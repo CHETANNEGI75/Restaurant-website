@@ -1,53 +1,108 @@
- import { createContext,  useEffect, useState } from 'react';
- import {food_list} from '../assets/assets'
- export const StoreContext = createContext(null);
- const StoreContextProvider = (props)=>{
+import { createContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
-const [cartItems, setCartItems] = useState({});
-const url = "http://localhost:4000"
-const [token,setToken] = useState("");
-const addToCart = (itemId)=>{
-    if(!cartItems[itemId]){
-        setCartItems(prev=>({...prev, [itemId]:1}))
-}
-else{
-    setCartItems(prev=>({...prev, [itemId]:prev[itemId]+1}))
-}
-}
-const removeFromCart = (itemId)=>{
-    setCartItems((prev)=>({
-        ...prev,
-        [itemId]: prev[itemId] - 1
-    })) 
-}
-    const getTotalCartAmount = () => {
-        let totalAmount = 0;
-        for (const item in cartItems) {
-            if (cartItems[item] > 0){
-                  let itemInfo = food_list.find((i) => i._id === item);
-            totalAmount += cartItems[item] * itemInfo.price;
-            }
-        }
-        return totalAmount;
+// 🔹 Create global context
+export const StoreContext = createContext(null);
+
+const StoreContextProvider = (props) => {
+
+  // 🔹 Cart items ( {itemId: quantity} )
+  const [cartItems, setCartItems] = useState({});
+
+  // 🔹 Backend URL
+  const url = "http://localhost:4000";
+
+  // 🔹 Auth token
+  const [token, setToken] = useState("");
+
+  // 🔹 Food list from backend
+  const [food_List, setFoodList] = useState([]);
+
+  // 🔹 Add item to cart
+  const addToCart = (itemId) => {
+    if (!cartItems[itemId]) {
+      setCartItems(prev => ({ ...prev, [itemId]: 1 }));
+    } else {
+      setCartItems(prev => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
-      
+  };
 
-    const ContextValue = {
-  food_list,
-  cartItems,
-  setCartItems,
-  addToCart,
-  removeFromCart,
-  getTotalCartAmount,
-  url: "http://localhost:4000", // 🔥 hardcode test
-  token,
-  setToken
+  // 🔹 Remove item from cart
+  const removeFromCart = (itemId) => {
+    setCartItems(prev => ({
+      ...prev,
+      [itemId]: prev[itemId] - 1
+    }));
+  };
+
+  // 🔹 Calculate total cart amount
+  const getTotalCartAmount = () => {
+    let totalAmount = 0;
+
+    for (const item in cartItems) {
+      if (cartItems[item] > 0) {
+
+        // 🔥 Use correct state (food_List)
+        let itemInfo = food_List.find((i) => i._id === item);
+
+        // 🔥 Safety check (important)
+        if (itemInfo) {
+          totalAmount += cartItems[item] * itemInfo.price;
+        }
+      }
+    }
+
+    return totalAmount;
+  };
+
+  // 🔹 Fetch food list from backend
+  const fetchFoodList = async () => {
+  try {
+    const response = await axios.get(url + "/api/food/list"); // 🔥 FIX URL ALSO
+
+    console.log("API RESPONSE 👉", response.data);
+
+    // adjust based on backend
+    setFoodList(response.data.data || response.data.foods || []);
+    
+  } catch (error) {
+    console.error("Error fetching food list:", error);
+  }
 };
 
-    return(
-        <StoreContext.Provider value={ContextValue}>
-            {props.children}
-        </StoreContext.Provider>
-    )
- }
- export default StoreContextProvider; 
+  // 🔹 Load data on refresh
+  useEffect(() => {
+    async function loadData() {
+      await fetchFoodList();
+
+      // 🔹 Load token from localStorage
+      const savedToken = localStorage.getItem("token");
+      if (savedToken) {
+        setToken(savedToken);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  // 🔹 Global data provider
+  const ContextValue = {
+    food_list: food_List,   // 🔥 keep naming consistent for components
+    cartItems,
+    setCartItems,
+    addToCart,
+    removeFromCart,
+    getTotalCartAmount,
+    url,
+    token,
+    setToken
+  };
+
+  return (
+    <StoreContext.Provider value={ContextValue}>
+      {props.children}
+    </StoreContext.Provider>
+  );
+};
+
+export default StoreContextProvider;

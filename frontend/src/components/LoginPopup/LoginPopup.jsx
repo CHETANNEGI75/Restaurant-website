@@ -8,6 +8,7 @@ const LoginPopup = ({setShowLogin}) => {
 const context = useContext(StoreContext);
 console.log("URL 👉", context.url);
   const[currstate,setCurrstate] = useState("login");
+  const [token,setToken] = useState("");
 const [data,setData] = useState({
   name:"",
   email:"",
@@ -26,13 +27,14 @@ const onChangeHandler = (event) => {
 console.log("Form Submit Triggered 🚀");
 const onLogin = async(event) => {
   event.preventDefault();
-  let newUrl = url;
+  let newUrl = context?.url;
   if(currstate==="login"){
     newUrl += "/api/user/login";
   } else {
     newUrl += "/api/user/register";
   }
   const response = await axios.post(newUrl,data);
+  console.log("Login Response 👉", response);
   if(response.data.success){
     setToken(response.data.token);
     // local storage mai save kiya 

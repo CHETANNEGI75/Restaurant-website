@@ -4,6 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* LOGO */
@@ -18,11 +19,16 @@
   gap: 20px;
   color: #49557e;
   font-size: 18px;
+    align-items: center;
 }
 
 .navbar-menu a {
   text-decoration: none;
   color: inherit;
+  transition: 0.2s ease;
+}
+.navbar-menu a:hover {
+  color: tomato;
 }
 
 /* ACTIVE LINK */
@@ -52,6 +58,7 @@
 
 .navbar button:hover {
   background-color: #fff4f2;
+  transform: scale(1.05);
 }
 
 /* LIST ITEMS */
@@ -96,6 +103,7 @@
   padding: 10px 0px;
   min-width: 160px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 
   /* animation */
   opacity: 0;

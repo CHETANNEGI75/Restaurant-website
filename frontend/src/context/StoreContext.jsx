@@ -19,20 +19,26 @@ const StoreContextProvider = (props) => {
   const [food_List, setFoodList] = useState([]);
 
   // 🔹 Add item to cart
-  const addToCart = (itemId) => {
+  const addToCart = async(itemId) => {
     if (!cartItems[itemId]) {
       setCartItems(prev => ({ ...prev, [itemId]: 1 }));
     } else {
       setCartItems(prev => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
+     if (token) {
+    await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
+  }
   };
 
   // 🔹 Remove item from cart
-  const removeFromCart = (itemId) => {
+  const removeFromCart =async (itemId) => {
     setCartItems(prev => ({
       ...prev,
-      [itemId]: prev[itemId] - 1
+      [itemId]: Math.max(prev[itemId] - 1, 0)
     }));
+    if (token) {
+      await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
+    }
   };
 
   // 🔹 Calculate total cart amount
@@ -69,6 +75,10 @@ const StoreContextProvider = (props) => {
     console.error("Error fetching food list:", error);
   }
 };
+const loadCartData = async (token) => {
+  const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
+  setCartItems(response.data.cartData);
+};
 
   // 🔹 Load data on refresh
   useEffect(() => {
@@ -77,9 +87,10 @@ const StoreContextProvider = (props) => {
 
       // 🔹 Load token from localStorage
       const savedToken = localStorage.getItem("token");
-      if (savedToken) {
-        setToken(savedToken);
-      }
+     if (savedToken) {
+  setToken(savedToken);
+  await loadCartData(savedToken);
+}
     }
 
     loadData();

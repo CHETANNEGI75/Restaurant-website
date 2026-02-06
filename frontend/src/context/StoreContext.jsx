@@ -25,9 +25,13 @@ const StoreContextProvider = (props) => {
     } else {
       setCartItems(prev => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
-     if (token) {
+    if (token) {
+  try {
     await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
+  } catch (error) {
+    console.error("Error adding to cart:", error);
   }
+}
   };
 
   // 🔹 Remove item from cart
@@ -37,8 +41,12 @@ const StoreContextProvider = (props) => {
       [itemId]: Math.max(prev[itemId] - 1, 0)
     }));
     if (token) {
-      await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
-    }
+  try {
+    await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
+  } catch (error) {
+    console.error("Error removing from cart:", error);
+  }
+}
   };
 
   // 🔹 Calculate total cart amount
@@ -76,8 +84,17 @@ const StoreContextProvider = (props) => {
   }
 };
 const loadCartData = async (token) => {
-  const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
-  setCartItems(response.data.cartData);
+  try {
+    const response = await axios.post(
+      url + "/api/cart/get",
+      {},
+      { headers: { token } }
+    );
+
+    setCartItems(response.data.cartData || {});
+  } catch (error) {
+    console.error("Error loading cart:", error);
+  }
 };
 
   // 🔹 Load data on refresh

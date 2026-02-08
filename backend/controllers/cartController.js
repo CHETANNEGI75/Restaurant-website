@@ -3,11 +3,11 @@ import userModel from "../models/userModel.js";
 // 🔹 ADD TO CART
 const addToCart = async (req, res) => {
   try {
-    const userId = req?.body?.userId; // from auth middleware
-    const { itemId } = req.body;// from frontend
+    const userId = req.userId;
+    const { itemId } = req.body;
 
-    const user = await userModel.findById(userId?.id);
-    let cartData = user.cartData;
+    const user = await userModel.findById(userId);
+    let cartData = user.cartData || {};
 
     if (!cartData[itemId]) {
       cartData[itemId] = 1;
@@ -15,7 +15,7 @@ const addToCart = async (req, res) => {
       cartData[itemId] += 1;
     }
 
-    await userModel.findByIdAndUpdate(userId?.id, { cartData });
+    await userModel.findByIdAndUpdate(userId, { cartData });
 
     res.json({ success: true, message: "Added to cart" });
 
@@ -32,7 +32,7 @@ const removeFromCart = async (req, res) => {
     const { itemId } = req.body;
 
     const user = await userModel.findById(userId);
-    let cartData = user.cartData;
+    let cartData = user.cartData || {};
 
     if (cartData[itemId] > 0) {
       cartData[itemId] -= 1;
@@ -55,7 +55,7 @@ const getCartItems = async (req, res) => {
 
     const user = await userModel.findById(userId);
 
-    res.json({ success: true, cartData: user.cartData });
+    res.json({ success: true, cartData: user.cartData || {} });
 
   } catch (error) {
     console.log(error);
@@ -63,5 +63,4 @@ const getCartItems = async (req, res) => {
   }
 };
 
-// 🔥 EXPORT ALL (VERY IMPORTANT)
 export { addToCart, removeFromCart, getCartItems };

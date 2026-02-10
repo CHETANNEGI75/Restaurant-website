@@ -4,7 +4,7 @@ import "./Add.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 const Add = ({ url }) => {
-const [image, setImage] = useState(false);
+const [image, setImage] = useState(null);
 const[data,setData] = useState({
   name:"",
   description:"",
@@ -19,20 +19,25 @@ const[data,setData] = useState({
     formData.append("category",data.category);
     formData.append("price",Number(data.price));
     formData.append("image",image);
-  const response = await axios.post(`${url}/api/food/add`,formData,)
-  if(response.data.success){
-setData({
-  name:"",
-  description:"",
-  category:"Salad",
-  price:""
-})
-setImage(false)
-toast.success(response.data.message)
+  try {
+  const response = await axios.post(`${url}/api/food/add`, formData);
+
+  if (response.data.success) {
+    setData({
+      name: "",
+      description: "",
+      category: "Salad",
+      price: ""
+    });
+    setImage(null);
+    toast.success(response.data.message);
+  } else {
+    toast.error(response.data.message);
   }
-  else{
-toast.error(response.data.message)
-  }
+
+} catch (error) {
+  toast.error("Error adding product");
+}
   }
 const onChangeHandler = (event) => {
 const name = event.target.name;
@@ -73,7 +78,7 @@ setData((data) => ({
               <option value="Rolls">Rolls</option>
               <option value="Deserts">Deserts</option>
               <option value="Sandwich">Sandwich</option>
-              <option value=" Cake">Cake</option>
+              <option value="Cake">Cake</option>
               <option value="Pure veg">Pure veg</option>
               <option value="Pasta">Pasta</option>
               <option value="Noodles">Noodles</option>
@@ -85,8 +90,8 @@ setData((data) => ({
         </div>
         </div>
         <button type="submit" className="add-btn">
-          Add Product
-        </button>
+  Add Product
+</button>
       </form>
     </div>
   );

@@ -48,3 +48,10 @@
 .list-table-format button:hover {
   background-color: #d9363e;
 }
+.search-input {
+  padding: 8px;
+  width: 250px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}

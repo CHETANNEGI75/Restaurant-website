@@ -4,7 +4,9 @@ import "./List.css";
 import { toast } from 'react-toastify';
 
 const List = ({ url }) => {
+
   const [list, setList] = useState([]);
+  const [search, setSearch] = useState(""); // ✅ yaha
 
   const fetchList = async () => {
     try {
@@ -16,8 +18,7 @@ const List = ({ url }) => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log("API ERROR 👉", error);
-      toast.error("Failed to fetch food list ❌");
+      console.log(error);
     }
   };
 
@@ -25,17 +26,11 @@ const List = ({ url }) => {
     try {
       const response = await axios.post(`${url}/api/food/remove`, { id: foodId });
 
-      if (response.data.success) {
-        toast.success("Deleted successfully 🗑️");
-
-        // 🔥 instant UI update (no full reload feel)
-        setList((prev) => prev.filter((item) => item._id !== foodId));
-      } else {
-        toast.error("Failed to delete ❌");
+        if (response.data.success) {
+          setList((prev) => prev.filter((item) => item._id !== foodId));
       }
     } catch (error) {
       console.log(error);
-      toast.error("API Error ❌");
     }
   };
 
@@ -43,38 +38,41 @@ const List = ({ url }) => {
     fetchList();
   }, []);
 
+  // ✅ YAHI SAHI JAGAH
+  const filteredList = list.filter((item) =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+    );
+
   return (
     <div className='list add flex-col'>
-      <p>All Food List</p>
+      <p>All food list</p>
+
+      {/* ✅ search input */}
+      <input
+        type="text"
+        placeholder="Search food..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+          />
 
       <div className="list-table">
-        
-        {/* Header */}
         <div className="list-table-format title">
-          <b>Image</b>
-          <b>Name</b>
-          <b>Category</b>
-          <b>Price</b>
-          <b>Action</b>
+          <b>image</b>
+          <b>name</b>
+          <b>category</b>
+          <b>price</b>
+          <b>action</b>
         </div>
 
-        {/* Items */}
-        {list.map((item) => (
+        {filteredList.map((item) => (
           <div key={item._id} className="list-table-format">
             <img src={`${url}/images/` + item.image} alt={item.name} />
             <p>{item.name}</p>
             <p>{item.category}</p>
             <p>₹{item.price}</p>
-
-            <button
-              onClick={() => removeFood(item._id)}
-              className="delete-btn"
-            >
-              Delete
-            </button>
+            <button onClick={() => removeFood(item._id)}>Delete</button>
           </div>
         ))}
-
       </div>
     </div>
   );

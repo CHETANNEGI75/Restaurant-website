@@ -6,10 +6,13 @@ import { toast } from 'react-toastify';
 const List = ({ url }) => {
 
   const [list, setList] = useState([]);
-  const [search, setSearch] = useState(""); // ✅ yaha
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fetchList = async () => {
     try {
+      setLoading(true);
+
       const response = await axios.get(`${url}/api/food/list`);
 
       if (response.data.success) {
@@ -17,8 +20,12 @@ const List = ({ url }) => {
       } else {
         toast.error(response.data.message);
       }
+
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
+      toast.error("Failed to fetch data ❌");
     }
   };
 
@@ -26,8 +33,8 @@ const List = ({ url }) => {
     try {
       const response = await axios.post(`${url}/api/food/remove`, { id: foodId });
 
-        if (response.data.success) {
-          setList((prev) => prev.filter((item) => item._id !== foodId));
+      if (response.data.success) {
+        setList((prev) => prev.filter((item) => item._id !== foodId));
       }
     } catch (error) {
       console.log(error);
@@ -38,24 +45,33 @@ const List = ({ url }) => {
     fetchList();
   }, []);
 
-  // ✅ YAHI SAHI JAGAH
   const filteredList = list.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
-    );
+  );
 
   return (
     <div className='list add flex-col'>
+
+      {/* ✅ Loading */}
+      {loading && <p>Loading items...</p>}
+
       <p>All food list</p>
 
-      {/* ✅ search input */}
+      {/* ✅ Search */}
       <input
         type="text"
         placeholder="Search food..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-          />
+      />
 
       <div className="list-table">
+
+        {/* ✅ Empty State */}
+        {!loading && filteredList.length === 0 && (
+          <p>No food items found 😕</p>
+        )}
+
         <div className="list-table-format title">
           <b>image</b>
           <b>name</b>
@@ -64,7 +80,8 @@ const List = ({ url }) => {
           <b>action</b>
         </div>
 
-        {filteredList.map((item) => (
+        {/* ✅ List render */}
+        {!loading && filteredList.map((item) => (
           <div key={item._id} className="list-table-format">
             <img src={`${url}/images/` + item.image} alt={item.name} />
             <p>{item.name}</p>
@@ -73,6 +90,7 @@ const List = ({ url }) => {
             <button onClick={() => removeFood(item._id)}>Delete</button>
           </div>
         ))}
+
       </div>
     </div>
   );

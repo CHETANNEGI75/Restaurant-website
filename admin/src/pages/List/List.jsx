@@ -9,6 +9,13 @@ const List = ({ url }) => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // 🔥 NEW STATES
+  const [editId, setEditId] = useState(null);
+  const [editData, setEditData] = useState({
+    name: "",
+    price: "",
+  });
+
   const fetchList = async () => {
     try {
       setLoading(true);
@@ -41,6 +48,21 @@ const List = ({ url }) => {
     }
   };
 
+  // 🔥 UPDATE FUNCTION
+  const updateFood = async (id) => {
+    try {
+      await axios.post(`${url}/api/food/update`, {
+        id,
+        ...editData,
+      });
+
+      setEditId(null);
+      fetchList();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchList();
   }, []);
@@ -52,12 +74,10 @@ const List = ({ url }) => {
   return (
     <div className='list add flex-col'>
 
-      {/* ✅ Loading */}
       {loading && <p>Loading items...</p>}
 
       <p>All food list</p>
 
-      {/* ✅ Search */}
       <input
         type="text"
         placeholder="Search food..."
@@ -67,7 +87,6 @@ const List = ({ url }) => {
 
       <div className="list-table">
 
-        {/* ✅ Empty State */}
         {!loading && filteredList.length === 0 && (
           <p>No food items found 😕</p>
         )}
@@ -80,14 +99,55 @@ const List = ({ url }) => {
           <b>action</b>
         </div>
 
-        {/* ✅ List render */}
         {!loading && filteredList.map((item) => (
           <div key={item._id} className="list-table-format">
             <img src={`${url}/images/` + item.image} alt={item.name} />
-            <p>{item.name}</p>
-            <p>{item.category}</p>
-            <p>₹{item.price}</p>
-            <button onClick={() => removeFood(item._id)}>Delete</button>
+
+            {editId === item._id ? (
+              <>
+                <input
+                  value={editData.name}
+                  onChange={(e) =>
+                    setEditData({ ...editData, name: e.target.value })
+                  }
+                />
+
+                <p>{item.category}</p>
+
+                <input
+                  value={editData.price}
+                  onChange={(e) =>
+                    setEditData({ ...editData, price: e.target.value })
+                  }
+                />
+
+                <button onClick={() => updateFood(item._id)}>
+                  Save
+                </button>
+              </>
+            ) : (
+              <>
+                <p>{item.name}</p>
+                <p>{item.category}</p>
+                <p>₹{item.price}</p>
+
+                <button
+                  onClick={() => {
+                    setEditId(item._id);
+                    setEditData({
+                      name: item.name,
+                      price: item.price,
+                    });
+                  }}
+                >
+                  Edit
+                </button>
+
+                <button onClick={() => removeFood(item._id)}>
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         ))}
 

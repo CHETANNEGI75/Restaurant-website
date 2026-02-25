@@ -7,6 +7,7 @@ const MyOrders = () => {
   const { url, token } = useContext(StoreContext);
 
   const [orders, setOrders] = useState([]);
+  const [search, setSearch] = useState(""); // 🔥 NEW
 
   const fetchOrders = async () => {
     try {
@@ -26,10 +27,8 @@ const MyOrders = () => {
     if (token) fetchOrders();
   }, [token]);
 
-  // 🔥 CANCEL FUNCTION
   const cancelOrder = async (orderId) => {
     const confirm = window.confirm("Cancel this order?");
-
     if (!confirm) return;
 
     try {
@@ -40,41 +39,64 @@ const MyOrders = () => {
       );
 
       if (response.data.success) {
-        fetchOrders(); // refresh list
+        fetchOrders();
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  // 🔥 FILTER LOGIC
+  const filteredOrders = orders.filter((order) =>
+    order.status.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="myorders">
       <h2>My Orders</h2>
 
-      {orders.length === 0 ? (
+      {/* 🔥 SEARCH INPUT */}
+      <input
+        type="text"
+        placeholder="Search by status..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="order-search"
+      />
+
+      {filteredOrders.length === 0 ? (
         <p>No orders found 😕</p>
       ) : (
-        orders.map((order) => (
+        filteredOrders.map((order) => (
           <div key={order._id} className="order-card">
 
             <p><strong>Amount:</strong> ₹{order.amount}</p>
 
-            <p>
-              <strong>Status:</strong>{" "}
-              <span
-                className={`order-status ${
-                  order.status === "Delivered"
-                    ? "delivered"
-                    : order.status === "Out for Delivery"
-                    ? "delivery"
-                    : "pending"
-                }`}
-              >
-                {order.status}
-              </span>
-            </p>
+            {/* 🔥 STATUS */}
+            <div className="order-progress">
 
-            {/* 🔥 CANCEL BUTTON */}
+              <span className={order.status !== "Pending" ? "active" : ""}>
+                🧾 Order Placed
+              </span>
+
+              <span
+                className={
+                  order.status === "Out for Delivery" ||
+                  order.status === "Delivered"
+                    ? "active"
+                    : ""
+                }
+              >
+                🚚 Out for Delivery
+              </span>
+
+              <span className={order.status === "Delivered" ? "active" : ""}>
+                ✅ Delivered
+              </span>
+
+            </div>
+
+            {/* 🔥 CANCEL */}
             {order.status !== "Delivered" && (
               <button onClick={() => cancelOrder(order._id)}>
                 Cancel Order

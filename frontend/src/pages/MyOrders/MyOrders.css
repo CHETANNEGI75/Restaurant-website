@@ -46,3 +46,10 @@
 .order-card button:hover {
   background-color: #d9363e;
 }
+.order-search {
+  padding: 8px;
+  margin-bottom: 15px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}

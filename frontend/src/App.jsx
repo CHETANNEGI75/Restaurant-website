@@ -1,4 +1,4 @@
-import Navbar from './components/Navbar/Navbbar'
+import Navbar from './components/Navbar/Navbar'
 import { Routes, Route } from 'react-router-dom'
 import { useState } from 'react'
 import LoginPopup from './components/LoginPopup/LoginPopup'

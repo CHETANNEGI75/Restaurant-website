@@ -59,4 +59,4 @@ const updateStatus = async (req, res) => {
   }
 };  
 
-export { placeOrder, userOrders, allOrders };
+export { placeOrder, userOrders, allOrders, updateStatus };

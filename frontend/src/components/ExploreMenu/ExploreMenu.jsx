@@ -1,25 +1,52 @@
-import React from 'react'
-import { menu_list } from '../../assets/assets'
+import React, { useContext } from 'react'
 import './ExploreMenu.css'
-const ExploreMenu = ({category, setCategory}) => {
+import { StoreContext } from '../../context/StoreContext'
+
+const ExploreMenu = () => {
+
+  const { categories, category, setCategory, fetchFoodList } = useContext(StoreContext)
+
+  const handleClick = (itemName) => {
+    const selectedCategory = category === itemName ? "All" : itemName
+
+    setCategory(selectedCategory)
+    fetchFoodList(selectedCategory) // 🔥 API CALL
+  }
+
   return (
-    <div className="explore-menu" id="explore-menu">
+    <div className="explore-menu">
+
       <h1>Explore Our Menu</h1>
-      <p className="explore-menu-text">
-        Choose from a menu featuring delicious dishes from around the world.
-      </p>
 
       <div className="explore-menu-list">
-        {menu_list.map((item, index) => {
-          return (
-            <div onClick={()=>setCategory(prev=>prev===item.menu_name?"All":item.menu_name)} key={index} className="explore-menu-list-item">
-              <img className={category===item.menu_name?"active":""} src={item.menu_image} alt={item.menu_name} />
-              <p>{item.menu_name}</p>
-            </div>
-          )
-        })}
+
+        {categories.length > 0 ? (
+          categories.map((item) => {
+
+            return (
+              <div
+                key={item._id}
+                className="explore-menu-list-item"
+                onClick={() => handleClick(item._id)}
+              >
+                {/* IMAGE */}
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className={category === item.name ? "active" : ""}
+                />
+
+                {/* NAME */}
+                <p>{item.name}</p>
+              </div>
+            )
+          })
+        ) : (
+          <p>Loading categories...</p>
+        )}
+
       </div>
-      <hr />
+
     </div>
   )
 }

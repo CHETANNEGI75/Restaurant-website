@@ -1,41 +1,43 @@
 import React, { useContext } from 'react'
 import './FoodDisplay.css'
-import { StoreContext } from '../../context/StoreContext';
-import FoodItem from '../FoodItem/FoodItem';
+import { StoreContext } from '../../context/StoreContext'
+import FoodItem from '../FoodItem/FoodItem'
 
-const FoodDisplay = ({ category }) => {
+const FoodDisplay = () => {
 
-  const { food_list } = useContext(StoreContext);
+  const { food_list, category } = useContext(StoreContext)
 
-  console.log("FOOD LIST 👉", food_list);
+  // 🔥 FIXED FILTER (case insensitive)
+  const filteredFood = food_list.filter(
+    (item) =>
+      category === "All" ||
+      item.category?.toLowerCase() === category.toLowerCase()
+  )
 
   return (
     <div className='food-display' id='food-display'>
       <h2>Top Dishes near u</h2>
 
       <div className="food-display-list">
-        {food_list.length > 0 ? (
-          food_list.map((item) => {
-            if (category === "All" || item.category === category) {
-              return (
-                <FoodItem
-                  key={item._id}
-                  id={item._id}
-                  name={item.name}
-                  description={item.description}
-                  price={item.price}
-                  image={item.image}
-                />
-              );
-            }
-            return null;
-          })
+
+        {filteredFood.length > 0 ? (
+          filteredFood.map((item) => (
+            <FoodItem
+              key={item._id}
+              id={item._id}
+              name={item.name}
+              description={item.description}
+              price={item.price}
+              image={item.image}
+            />
+          ))
         ) : (
-          <p>Loading...</p>
+          <p>No food found 🍽️</p>
         )}
+
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FoodDisplay;
+export default FoodDisplay

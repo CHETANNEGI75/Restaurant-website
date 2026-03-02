@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { assets } from "../../assets/assets";
 import "./Add.css";
 import axios from "axios";
@@ -7,18 +7,46 @@ import { toast } from "react-toastify";
 const Add = ({ url }) => {
   const [image, setImage] = useState(null);
 
+  const [categories, setCategories] = useState([]);
+
   const [data, setData] = useState({
     name: "",
     description: "",
-    category: "Salad",
+    category: "",
     price: ""
   });
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${url}/api/category`);
+
+        if (response.statusText === "OK") {
+          setCategories(response?.data?.categories);
+
+          // auto select first category
+          if (response?.data?.categories?.length > 0) {
+            setData((prev) => ({
+              ...prev,
+              category: response.data.categories[0]._id
+            }));
+          }
+        } else {
+          toast.error("Failed to load categories ❌");
+        }
+      } catch (error) {
+        toast.error("Error fetching categories ❌");
+      }
+    };
+
+    fetchCategories();
+  }, [url]);
+
+  // 🔥 SUBMIT HANDLER
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    // 🔥 VALIDATION
-    if (!data.name || !data.description || !data.price || !image) {
+    if (!data.name || !data.description || !data.price || !image || !data.category) {
       toast.error("Please fill all fields and upload image ❌");
       return;
     }
@@ -27,7 +55,6 @@ const Add = ({ url }) => {
       toast.error("Price must be greater than 0 ❌");
       return;
     }
-
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
@@ -42,7 +69,7 @@ const Add = ({ url }) => {
         setData({
           name: "",
           description: "",
-          category: "Salad",
+          category: categories.length > 0 ? categories[0].name : "",
           price: ""
         });
         setImage(null);
@@ -56,12 +83,13 @@ const Add = ({ url }) => {
     }
   };
 
+  // 🔥 INPUT CHANGE HANDLER
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    setData((data) => ({
-      ...data,
+    setData((prev) => ({
+      ...prev,
       [name]: value
     }));
   };
@@ -123,14 +151,13 @@ const Add = ({ url }) => {
               value={data.category}
               name="category"
             >
-              <option value="Salad">Salad</option>
-              <option value="Rolls">Rolls</option>
-              <option value="Deserts">Deserts</option>
-              <option value="Sandwich">Sandwich</option>
-              <option value="Cake">Cake</option>
-              <option value="Pure veg">Pure veg</option>
-              <option value="Pasta">Pasta</option>
-              <option value="Noodles">Noodles</option>
+              <option value="">Select Category</option>
+
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -152,7 +179,7 @@ const Add = ({ url }) => {
         <button
           type="submit"
           className="add-btn"
-          disabled={!data.name || !data.description || !data.price || !image}
+          disabled={!data.name || !data.description || !data.price || !image || !data.category}
         >
           Add Product
         </button>

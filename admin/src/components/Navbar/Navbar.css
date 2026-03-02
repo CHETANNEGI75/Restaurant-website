@@ -1,15 +1,33 @@
-.navbar{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 4% ;
-
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
 }
-.navbar .logo{
-    width: max(10% , 80px);
 
+.logo {
+  width: 120px;
 }
-.navbar .profile{
-    width: 40px;
-    border-radius: 50%;
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.nav-links a:hover {
+  color: tomato;
+}
+
+.profile {
+  width: 40px;
+  border-radius: 50%;
 }

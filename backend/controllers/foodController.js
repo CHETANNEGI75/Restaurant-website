@@ -3,8 +3,6 @@ import foodModel from "../models/foodmodel.js";
 const addFood = async (req, res) => {
   try {
     const { name, category, description, price } = req.body;
-    console.info("🚀 ~ addFood ~ category:", category)
-    console.info("🚀 ~ addFood ~ name:", name)
 
     if (!req.file) {
       return res.status(400).json({
@@ -57,6 +55,10 @@ const removeFood = async (req, res) => {
 
 const listFood = async (req, res) => {
   try {
+    if(req?.query?.category !== "All") {
+      const foods = await foodModel.find({ category: req.query.category });
+      return res.json({ success: true, data: foods });
+    }
     const foods = await foodModel.find({});
     res.json({
       success: true,

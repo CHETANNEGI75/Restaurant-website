@@ -5,6 +5,8 @@ import "./PlaceOrder.css";
 
 const PlaceOrder = () => {
   const { getTotalCartAmount, cartItems, token, url } = useContext(StoreContext);
+  console.info("🚀 ~ PlaceOrder ~ token:", token)
+  console.info("🚀 ~ PlaceOrder ~ token:", token)
 
   const [loading, setLoading] = useState(false);
 
@@ -44,11 +46,15 @@ const PlaceOrder = () => {
         amount: getTotalCartAmount(),
         address: data
       };
-
+      
       const response = await axios.post(
         url + "/api/order/place",
         orderData,
-        { headers: { token } }
+        {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}
       );
 
       if (response.data.success) {

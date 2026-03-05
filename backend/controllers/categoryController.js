@@ -77,3 +77,17 @@ const image = req.file?.path;
             res.status(500).json({ message: "Server error" });
         }
     }
+
+    export const getAllProductsOfCategory = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const products = await categoryService.getAllProductsOfCategory(id);
+            if(!products.success) {
+                return res.status(404).json({ message: products.message });
+            }
+            return res.status(200).json({ message: products.message, products: products.data });
+        } catch (error) {
+            console.log("Error retrieving products of category:", error);
+            res.status(500).json({ message: "Server error" });
+        }
+    }

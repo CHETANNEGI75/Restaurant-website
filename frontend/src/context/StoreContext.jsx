@@ -26,25 +26,33 @@ const StoreContextProvider = (props) => {
   // =========================
   // 🛒 CART FUNCTIONS
   // =========================
+const addToCart = async (itemId) => {
+  setCartItems(prev => ({
+    ...prev,
+    [itemId]: prev[itemId] ? prev[itemId] + 1 : 1
+  }));
 
-  const addToCart = async (itemId) => {
-    setCartItems(prev => ({
-      ...prev,
-      [itemId]: prev[itemId] ? prev[itemId] + 1 : 1
-    }))
+  const currentToken = localStorage.getItem("token");
 
-    if (token) {
-      try {
-        await axios.post(
-          url + "/api/cart/add",
-          { itemId },
-          { headers: { token } }
-        )
-      } catch (error) {
-        console.error("Error adding to cart:", error)
-      }
-    }
+  if (!currentToken) {
+    console.log("User not logged in");
+    return;
   }
+
+  try {
+    await axios.post(
+      url + "/api/cart/add", // ✅ FIXED
+      { itemId },
+      {
+        headers: {
+          Authorization: `Bearer ${currentToken}` // ✅ FIXED
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+  }
+};
 
   const removeFromCart = async (itemId) => {
     setCartItems(prev => ({
@@ -56,8 +64,10 @@ const StoreContextProvider = (props) => {
       try {
         await axios.post(
           url + "/api/cart/remove",
-          { itemId },
-          { headers: { token } }
+          { itemId },{
+           headers: {
+  Authorization: `Bearer ${token}`
+}}
         )
       } catch (error) {
         console.error("Error removing from cart:", error)
@@ -119,19 +129,23 @@ const fetchCategories = async () => {
   // 🛒 LOAD CART (IF LOGGED IN)
   // =========================
 
-  const loadCartData = async (token) => {
-    try {
-      const res = await axios.post(
-        url + "/api/cart/get",
-        {},
-        { headers: { token } }
-      )
+ const loadCartData = async (token) => {
+  try {
+    const res = await axios.post(
+      url + "/api/cart/getCartData", // ✅ FIXED
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
-      setCartItems(res.data.cartData || {})
-    } catch (error) {
-      console.error("Error loading cart:", error)
-    }
+    setCartItems(res.data.cartData || {});
+  } catch (error) {
+    console.error("Error loading cart:", error);
   }
+};
 
   // =========================
   // 🚀 INITIAL LOAD

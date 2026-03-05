@@ -66,10 +66,11 @@ const Add = ({ url }) => {
       const response = await axios.post(`${url}/api/food/add`, formData);
 
       if (response.data.success) {
+        console.log("Product added:", categories);
         setData({
           name: "",
           description: "",
-          category: categories.length > 0 ? categories[0].name : "",
+          category: categories.length > 0 ? categories[0]._id : "",
           price: ""
         });
         setImage(null);
@@ -154,7 +155,7 @@ const Add = ({ url }) => {
               <option value="">Select Category</option>
 
               {categories.map((cat) => (
-                <option key={cat._id} value={cat.name}>
+                <option key={cat._id} value={cat._id}>
                   {cat.name}
                 </option>
               ))}

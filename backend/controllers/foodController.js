@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import foodModel from "../models/foodmodel.js";
 
 const addFood = async (req, res) => {
@@ -56,7 +57,7 @@ const removeFood = async (req, res) => {
 const listFood = async (req, res) => {
   try {
     if(req?.query?.category !== "All") {
-      const foods = await foodModel.find({ category: req.query.category });
+      const foods = await foodModel.find({ category: new mongoose.Types.ObjectId(req.query.category) });
       return res.json({ success: true, data: foods });
     }
     const foods = await foodModel.find({});

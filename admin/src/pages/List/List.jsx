@@ -21,7 +21,7 @@ const List = ({ url }) => {
       setLoading(true);
 
       const response = await axios.get(`${url}/api/food/list`);
-
+      console.log("FOOD LIST API 👉", response.data);
       if (response.data.success) {
         setList(response.data.data);
       } else {

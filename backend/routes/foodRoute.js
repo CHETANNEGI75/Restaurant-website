@@ -1,25 +1,17 @@
-import express from "express"
-import { addFood } from "../controllers/foodController"
-import multer from "multer"
+import express from "express";
+import upload from "../middleware/upload.js";
+import { addFood } from "../controllers/foodController.js";
 
-const foodRouter= express.Router();
+const foodRouter = express.Router();
 
-//image storage engine
-
-  const storage = multer.diskstorage({
-    destination :"uploads",
-    filename:(req,file,cb )=>{
-        return cb(null,`${Date.now()}${file.originalname}`)
-    }
-  })
-
-
-  const upload = multer({storage:storage})
-foodRouter.post("/add",upload.single("image"),addFood)
-
-
-
-
-
+foodRouter.post(
+  "/add",
+  (req, res, next) => {
+    console.log("🚀 FOOD ROUTE HIT");
+    next();
+  },
+  upload.single("image"),
+  addFood
+);
 
 export default foodRouter;

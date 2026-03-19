@@ -1,25 +1,37 @@
-import foodModel from "../models/foodmodel";
-import fs from 'fs'  
+import foodModel from "../models/foodmodel.js";
 
-//add  food item 
- const addFood = async (req,res)=>{
- let image_filename=`${req.file.filename}`;
- const food=new foodModel({
-    name:req.body.name,
-    description:req.body.description,
-        price:req.body.price,
-    category:req.body.category,
-    image:image_filename 
- })
- try {
+const addFood = async (req, res) => {
+  try {
+    const { name, category, description, price } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Image is required",
+      });
+    }
+
+    const food = new foodModel({
+      name,
+      description,
+      price,
+      category,
+      image: req.file.path, // ☁️ Cloudinary URL
+    });
+    console.log("REQ.FILE 👉", req.file);
+
     await food.save();
-    res.json({success:true,message:"food added "})
- } catch (error) {
-    console.log(error) 
-        res.json({success:false,message:"error"})
-    
- }
- }
 
+    res.json({
+      success: true,
+      message: "Food added successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
- export{addFood}
+export { addFood }; // 👈 YE LINE ZAROORI THI

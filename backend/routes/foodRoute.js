@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../middleware/upload.js";
-import { addFood } from "../controllers/foodController.js";
+import { addFood, listFood } from "../controllers/foodController.js";
 
 const foodRouter = express.Router();
 
@@ -13,5 +13,7 @@ foodRouter.post(
   upload.single("image"),
   addFood
 );
+
+foodRouter.get("/list", listFood);
 
 export default foodRouter;

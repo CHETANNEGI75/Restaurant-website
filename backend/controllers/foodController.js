@@ -16,8 +16,9 @@ const addFood = async (req, res) => {
       description,
       price,
       category,
-      image: req.file.path, // ☁️ Cloudinary URL
+      image: req.file.path,
     });
+
     console.log("REQ.FILE 👉", req.file);
 
     await food.save();
@@ -33,5 +34,38 @@ const addFood = async (req, res) => {
     });
   }
 };
+const removeFood = async (req, res) => {
+  try {
+    const { id } = req.body;
 
-export { addFood }; // 👈 YE LINE ZAROORI THI
+    await foodModel.findByIdAndDelete(id);
+
+    res.json({
+      success: true,
+      message: "Food deleted successfully"
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      success: false,
+      message: "Error deleting food"
+    });
+  }
+};
+
+const listFood = async (req, res) => {
+  try {
+    const foods = await foodModel.find({});
+    res.json({
+      success: true,
+      data: foods
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Error fetching food list"
+    });
+  }
+};
+
+export { addFood, listFood, removeFood };
